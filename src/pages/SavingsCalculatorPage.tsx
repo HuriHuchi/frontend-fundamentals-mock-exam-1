@@ -1,7 +1,19 @@
 import { SavingsProduct, useSavingProducts } from 'apis/queries/products';
+import { CalculationResult } from 'components/CalculationResult';
 import { SavingProductList } from 'components/SavingProductList';
+import { isNil } from 'es-toolkit';
 import { useMemo, useState } from 'react';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import {
+  Border,
+  colors,
+  ListHeader,
+  ListRow,
+  NavigationBar,
+  SelectBottomSheet,
+  Spacing,
+  Tab,
+  TextField,
+} from 'tosslib';
 import { comma, uncomma } from 'utils';
 
 type TabKey = 'products' | 'results';
@@ -19,9 +31,11 @@ export function SavingsCalculatorPage() {
 
   const filteredProducts = useMemo(() => {
     return savingProducts?.filter(product => {
-      const 월납입액통과 =
-        월납입액 == null ? true : product.minMonthlyAmount < 월납입액 && product.maxMonthlyAmount > 월납입액;
-      const 저축기간통과 = 저축기간 == null ? true : product.availableTerms === 저축기간;
+      const 월납입액통과 = isNil(월납입액)
+        ? true
+        : product.minMonthlyAmount < 월납입액 && product.maxMonthlyAmount > 월납입액;
+      const 저축기간통과 = isNil(저축기간) ? true : product.availableTerms === 저축기간;
+
       return 월납입액통과 && 저축기간통과;
     });
   }, [월납입액, 저축기간, savingProducts]);
@@ -79,43 +93,9 @@ export function SavingsCalculatorPage() {
           onSelect={setSelectedProduct}
         />
       )}
-
-      {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
-      {/* <Spacing size={8} />
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="예상 수익 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`1,000,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="목표 금액과의 차이"
-            topProps={{ color: colors.grey600 }}
-            bottom={`-500,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="추천 월 납입 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`100,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
+      {selectedTab === 'results' && (
+        <CalculationResult selectedProduct={selectedProduct} 목표금액={목표금액} 월납입액={월납입액} />
+      )}
 
       <Spacing size={8} />
       <Border height={16} />
@@ -153,10 +133,7 @@ export function SavingsCalculatorPage() {
         onClick={() => {}}
       />
 
-      <Spacing size={40} /> */}
-
-      {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
-      {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
+      <Spacing size={40} />
     </>
   );
 }
