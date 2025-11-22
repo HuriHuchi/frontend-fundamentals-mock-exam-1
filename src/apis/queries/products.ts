@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { http, isHttpError } from 'tosslib';
+import { http } from 'tosslib';
 
 export interface SavingsProduct {
   id: string;
@@ -11,14 +11,7 @@ export interface SavingsProduct {
 }
 
 export async function getSavingsProducts(): Promise<SavingsProduct[]> {
-  try {
-    return http.get<SavingsProduct[]>('/api/savings-products');
-  } catch (error) {
-    if (isHttpError(error)) {
-      throw new Error(error.message);
-    }
-    throw error;
-  }
+  return http.get<SavingsProduct[]>('/api/savings-products');
 }
 
 export function useSavingProducts() {

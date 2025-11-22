@@ -3,20 +3,17 @@ import { CalculationResult } from 'components/CalculationResult';
 import { RecommendProductList } from 'components/RecommendProductList';
 import { SavingProductList } from 'components/SavingProductList';
 import { isNil } from 'es-toolkit';
-import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
+import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs';
 import { useMemo } from 'react';
 import { Border, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { comma, uncomma } from 'utils';
 
-type TabKey = 'products' | 'results';
+const TabKeys = ['products', 'results'] as const;
+type TabKey = (typeof TabKeys)[number];
 
 export function SavingsCalculatorPage() {
   // query states
-  const [selectedTab, setSelectedTab] = useQueryState('tab', {
-    defaultValue: 'products' as TabKey,
-    parse: value => (value === 'results' ? 'results' : 'products'),
-    serialize: value => value,
-  });
+  const [selectedTab, setSelectedTab] = useQueryState('tab', parseAsStringLiteral(TabKeys).withDefault('products'));
   const [목표금액, set목표금액] = useQueryState('goal', parseAsInteger);
   const [월납입액, set월납입액] = useQueryState('monthly', parseAsInteger);
   const [저축기간, set저축기간] = useQueryState('term', parseAsInteger);
