@@ -3,8 +3,8 @@ import { CalculationResult } from 'components/CalculationResult';
 import { RecommendProductList } from 'components/RecommendProductList';
 import { SavingProductList } from 'components/SavingProductList';
 import { isNil } from 'es-toolkit';
-import { useMemo, useState } from 'react';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { useState } from 'react';
+import { Border, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { comma, uncomma } from 'utils';
 
 type TabKey = 'products' | 'results';
@@ -18,24 +18,22 @@ export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   // queries
-  const { data: savingProducts } = useSavingProducts();
+  const { data: savingProducts, isLoading, isError, error } = useSavingProducts();
 
-  const filteredProducts = useMemo(() => {
-    return savingProducts?.filter(product => {
+  // products
+  const filteredProducts =
+    savingProducts?.filter(product => {
       const 월납입액통과 =
         isNil(월납입액) || (product.minMonthlyAmount < 월납입액 && product.maxMonthlyAmount > 월납입액);
       const 저축기간통과 = isNil(저축기간) || product.availableTerms === 저축기간;
 
       return 월납입액통과 && 저축기간통과;
-    });
-  }, [월납입액, 저축기간, savingProducts]);
+    }) ?? [];
 
-  const recommendedProducts = useMemo(() => {
-    if (!filteredProducts) {
-      return [];
-    }
-    return [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-  }, [filteredProducts]);
+  const recommendedProducts =
+    filteredProducts && filteredProducts.length > 0
+      ? [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2)
+      : [];
 
   return (
     <>
@@ -83,22 +81,39 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {selectedTab === 'products' && (
-        <SavingProductList
-          products={filteredProducts ?? []}
-          selectedProductId={selectedProduct?.id ?? null}
-          onSelect={setSelectedProduct}
+      {isLoading && <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품 목록을 불러오는 중..." />} />}
+
+      {isError && (
+        <ListRow
+          contents={
+            <ListRow.Texts
+              type="1RowTypeA"
+              top={error instanceof Error ? error.message : '상품 목록을 불러오는 중 오류가 발생했습니다.'}
+            />
+          }
         />
       )}
-      {selectedTab === 'results' && (
-        <CalculationResult selectedProduct={selectedProduct} 목표금액={목표금액} 월납입액={월납입액} />
-      )}
 
-      <RecommendProductList
-        products={recommendedProducts}
-        selectedProductId={selectedProduct?.id ?? null}
-        onSelect={setSelectedProduct}
-      />
+      {!isLoading && !isError && (
+        <>
+          {selectedTab === 'products' && (
+            <SavingProductList
+              products={filteredProducts}
+              selectedProductId={selectedProduct?.id ?? null}
+              onSelect={setSelectedProduct}
+            />
+          )}
+          {selectedTab === 'results' && (
+            <CalculationResult selectedProduct={selectedProduct} 목표금액={목표금액} 월납입액={월납입액} />
+          )}
+
+          <RecommendProductList
+            products={recommendedProducts}
+            selectedProductId={selectedProduct?.id ?? null}
+            onSelect={setSelectedProduct}
+          />
+        </>
+      )}
 
       <Spacing size={40} />
     </>
