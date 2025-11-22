@@ -1,7 +1,7 @@
 import { SavingsProduct } from 'apis/queries/products';
 import { isNil } from 'es-toolkit';
-import { colors, ListRow } from 'tosslib';
-import { comma } from 'utils';
+import { Assets, colors, ListRow } from 'tosslib';
+import { comma, formatPrice } from 'utils';
 
 interface Props {
   selectedProduct: SavingsProduct | null;
@@ -20,7 +20,7 @@ export function CalculationResult({ selectedProduct, 목표금액, 월납입액 
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="목표 금액을 입력해주세요." />} />;
   }
 
-  const { annualRate, availableTerms, maxMonthlyAmount } = selectedProduct;
+  const { name, annualRate, availableTerms, minMonthlyAmount, maxMonthlyAmount } = selectedProduct;
 
   // 연이자율을 소수로 변환
   const 연이자율 = annualRate / 100;
@@ -43,6 +43,25 @@ export function CalculationResult({ selectedProduct, 목표금액, 월납입액 
           }
         />
       )}
+
+      {/* 선택된 상품 정보를 보여주기 */}
+      <div style={{ backgroundColor: colors.blue50 }}>
+        <ListRow
+          contents={
+            <ListRow.Texts
+              type="3RowTypeA"
+              top={name}
+              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+              middle={`연 이자율: ${annualRate}%`}
+              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+              bottom={`${formatPrice(minMonthlyAmount)} ~ ${formatPrice(maxMonthlyAmount)} | ${availableTerms}개월`}
+              bottomProps={{ fontSize: 13, color: colors.grey600 }}
+            />
+          }
+          right={<Assets.Icon name="icon-check-circle-green" />}
+        />
+      </div>
+
       <ListRow
         contents={
           <ListRow.Texts
