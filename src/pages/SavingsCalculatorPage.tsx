@@ -3,22 +3,34 @@ import { CalculationResult } from 'components/CalculationResult';
 import { RecommendProductList } from 'components/RecommendProductList';
 import { SavingProductList } from 'components/SavingProductList';
 import { isNil } from 'es-toolkit';
-import { useState } from 'react';
+import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
+import { useMemo } from 'react';
 import { Border, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { comma, uncomma } from 'utils';
 
 type TabKey = 'products' | 'results';
 
 export function SavingsCalculatorPage() {
-  // states
-  const [selectedTab, setSelectedTab] = useState<TabKey>('products');
-  const [목표금액, set목표금액] = useState<number | null>(null);
-  const [월납입액, set월납입액] = useState<number | null>(null);
-  const [저축기간, set저축기간] = useState<number | null>(null);
-  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+  // query states
+  const [selectedTab, setSelectedTab] = useQueryState('tab', {
+    defaultValue: 'products' as TabKey,
+    parse: value => (value === 'results' ? 'results' : 'products'),
+    serialize: value => value,
+  });
+  const [목표금액, set목표금액] = useQueryState('goal', parseAsInteger);
+  const [월납입액, set월납입액] = useQueryState('monthly', parseAsInteger);
+  const [저축기간, set저축기간] = useQueryState('term', parseAsInteger);
+  const [selectedProductId, setSelectedProductId] = useQueryState('productId', parseAsString);
 
   // queries
   const { data: savingProducts, isLoading, isError, error } = useSavingProducts();
+
+  const selectedProduct = useMemo(() => {
+    if (!selectedProductId || !savingProducts) {
+      return null;
+    }
+    return savingProducts.find(product => product.id === selectedProductId) ?? null;
+  }, [selectedProductId, savingProducts]);
 
   // products
   const filteredProducts =
@@ -35,6 +47,11 @@ export function SavingsCalculatorPage() {
       ? [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2)
       : [];
 
+  // handlers
+  const handleSelectProduct = (product: SavingsProduct) => {
+    setSelectedProductId(product.id);
+  };
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -46,7 +63,10 @@ export function SavingsCalculatorPage() {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={comma(목표금액)}
-        onChange={e => set목표금액(e.target.value ? uncomma(e.target.value) : null)}
+        onChange={e => {
+          const value = e.target.value ? uncomma(e.target.value) : null;
+          set목표금액(value);
+        }}
       />
       <Spacing size={16} />
       <TextField
@@ -54,7 +74,10 @@ export function SavingsCalculatorPage() {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={comma(월납입액)}
-        onChange={e => set월납입액(e.target.value ? uncomma(e.target.value) : null)}
+        onChange={e => {
+          const value = e.target.value ? uncomma(e.target.value) : null;
+          set월납입액(value);
+        }}
       />
       <Spacing size={16} />
       <SelectBottomSheet
@@ -99,8 +122,8 @@ export function SavingsCalculatorPage() {
           {selectedTab === 'products' && (
             <SavingProductList
               products={filteredProducts}
-              selectedProductId={selectedProduct?.id ?? null}
-              onSelect={setSelectedProduct}
+              selectedProductId={selectedProductId}
+              onSelect={handleSelectProduct}
             />
           )}
           {selectedTab === 'results' && (
@@ -109,8 +132,8 @@ export function SavingsCalculatorPage() {
 
           <RecommendProductList
             products={recommendedProducts}
-            selectedProductId={selectedProduct?.id ?? null}
-            onSelect={setSelectedProduct}
+            selectedProductId={selectedProductId}
+            onSelect={handleSelectProduct}
           />
         </>
       )}
