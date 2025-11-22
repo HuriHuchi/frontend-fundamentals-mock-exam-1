@@ -1,19 +1,10 @@
 import { SavingsProduct, useSavingProducts } from 'apis/queries/products';
 import { CalculationResult } from 'components/CalculationResult';
+import { RecommendProductList } from 'components/RecommendProductList';
 import { SavingProductList } from 'components/SavingProductList';
 import { isNil } from 'es-toolkit';
 import { useMemo, useState } from 'react';
-import {
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { comma, uncomma } from 'utils';
 
 type TabKey = 'products' | 'results';
@@ -31,14 +22,20 @@ export function SavingsCalculatorPage() {
 
   const filteredProducts = useMemo(() => {
     return savingProducts?.filter(product => {
-      const 월납입액통과 = isNil(월납입액)
-        ? true
-        : product.minMonthlyAmount < 월납입액 && product.maxMonthlyAmount > 월납입액;
-      const 저축기간통과 = isNil(저축기간) ? true : product.availableTerms === 저축기간;
+      const 월납입액통과 =
+        isNil(월납입액) || (product.minMonthlyAmount < 월납입액 && product.maxMonthlyAmount > 월납입액);
+      const 저축기간통과 = isNil(저축기간) || product.availableTerms === 저축기간;
 
       return 월납입액통과 && 저축기간통과;
     });
   }, [월납입액, 저축기간, savingProducts]);
+
+  const recommendedProducts = useMemo(() => {
+    if (!filteredProducts) {
+      return [];
+    }
+    return [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  }, [filteredProducts]);
 
   return (
     <>
@@ -97,40 +94,10 @@ export function SavingsCalculatorPage() {
         <CalculationResult selectedProduct={selectedProduct} 목표금액={목표금액} 월납입액={월납입액} />
       )}
 
-      <Spacing size={8} />
-      <Border height={16} />
-      <Spacing size={8} />
-
-      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-      <Spacing size={12} />
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 3.2%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`100,000원 ~ 500,000원 | 12개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 2.8%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`50,000원 ~ 1,000,000원 | 24개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
+      <RecommendProductList
+        products={recommendedProducts}
+        selectedProductId={selectedProduct?.id ?? null}
+        onSelect={setSelectedProduct}
       />
 
       <Spacing size={40} />
