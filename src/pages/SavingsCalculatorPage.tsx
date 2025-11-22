@@ -1,4 +1,4 @@
-import { useSavingProducts } from 'apis/queries/products';
+import { SavingsProduct, useSavingProducts } from 'apis/queries/products';
 import { SavingProductList } from 'components/SavingProductList';
 import { useMemo, useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
@@ -12,6 +12,7 @@ export function SavingsCalculatorPage() {
   const [목표금액, set목표금액] = useState<number | null>(null);
   const [월납입액, set월납입액] = useState<number | null>(null);
   const [저축기간, set저축기간] = useState<number | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   // queries
   const { data: savingProducts } = useSavingProducts();
@@ -71,7 +72,13 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {selectedTab === 'products' && <SavingProductList products={filteredProducts ?? []} />}
+      {selectedTab === 'products' && (
+        <SavingProductList
+          products={filteredProducts ?? []}
+          selectedProductId={selectedProduct?.id ?? null}
+          onSelect={setSelectedProduct}
+        />
+      )}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />

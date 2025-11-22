@@ -1,13 +1,16 @@
 import { SavingsProduct } from 'apis/queries/products';
 import { Fragment } from 'react';
-import { colors, ListRow } from 'tosslib';
+import { Assets, colors, ListRow } from 'tosslib';
 import { formatPrice } from 'utils';
 
 interface Props {
   products: SavingsProduct[];
+  selectedProductId: string | null;
+  onSelect: (product: SavingsProduct) => void;
 }
 
-export function SavingProductList({ products }: Props) {
+export function SavingProductList({ products, selectedProductId, onSelect }: Props) {
+  const isSelected = (productId: string) => selectedProductId === productId;
   return (
     <Fragment>
       {products.map(product => (
@@ -24,6 +27,8 @@ export function SavingProductList({ products }: Props) {
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
+          right={isSelected(product.id) ? <Assets.Icon name="icon-check-circle-green" /> : null}
+          onClick={() => onSelect(product)}
         />
       ))}
     </Fragment>
