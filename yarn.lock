@@ -959,6 +959,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/query-core@npm:5.90.10":
+  version: 5.90.10
+  resolution: "@tanstack/query-core@npm:5.90.10"
+  checksum: 10c0/c51762d4413f99886af24d0a4897e286233fae305131df2db8294c26b1375e74e87d0cd7dafbe1b7d23338221fca0304c05058dd9a909c0988a8829d8f7283e6
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.90.10":
+  version: 5.90.10
+  resolution: "@tanstack/react-query@npm:5.90.10"
+  dependencies:
+    "@tanstack/query-core": "npm:5.90.10"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/a852c44fafb0331a47ba8b46f96bc6c3c66a1bfbec8a09de15fc0ba6fd1b867da42c4974f83489a03cc4d7fd9fa40ec23b8790d2f69a930ca63b85f2bf4a4885
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:1.0.8":
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
@@ -3706,6 +3724,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-loading-skeleton@npm:^3.5.0":
+  version: 3.5.0
+  resolution: "react-loading-skeleton@npm:3.5.0"
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: 10c0/a081f561c9700fead6ba98b91e3fe77a36a680e3fd69dbf4eecbaa5fabcb7173049c6d6fb7487355331a770bed432356edaa147702f3d46ddf0d6caa623e779f
+  languageName: node
+  linkType: hard
+
 "react-router-dom@npm:^7.1.1":
   version: 7.9.3
   resolution: "react-router-dom@npm:7.9.3"
@@ -4392,6 +4419,7 @@ __metadata:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.0"
     "@hono/vite-dev-server": "npm:^0.18.0"
+    "@tanstack/react-query": "npm:^5.90.10"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8.18.2"
@@ -4407,6 +4435,7 @@ __metadata:
     prettier: "npm:^3.4.2"
     react: "npm:^18"
     react-dom: "npm:^18"
+    react-loading-skeleton: "npm:^3.5.0"
     react-router-dom: "npm:^7.1.1"
     tosslib: "file:./tosslib.tgz"
     typescript: "npm:~5.7.2"
