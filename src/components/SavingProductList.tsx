@@ -1,18 +1,16 @@
-import { useSavingProducts } from 'apis/queries/products';
+import { SavingsProduct } from 'apis/queries/products';
 import { Fragment } from 'react';
 import { colors, ListRow } from 'tosslib';
-import Skeleton from 'react-loading-skeleton';
+import { formatPrice } from 'utils';
 
-export function SavingProducts() {
-  const { data: savingProducts, isLoading } = useSavingProducts();
+interface Props {
+  products: SavingsProduct[];
+}
 
-  if (isLoading) {
-    return <Skeleton count={5} height={80} />;
-  }
-
+export function SavingProductList({ products }: Props) {
   return (
     <Fragment>
-      {savingProducts?.map(product => (
+      {products.map(product => (
         <ListRow
           key={product.id}
           contents={
@@ -22,7 +20,7 @@ export function SavingProducts() {
               topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
               middle={`연 이자율: ${product.annualRate}%`}
               middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원 | ${product.availableTerms}개월`}
+              bottom={`${formatPrice(product.minMonthlyAmount)} ~ ${formatPrice(product.maxMonthlyAmount)} | ${product.availableTerms}개월`}
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }

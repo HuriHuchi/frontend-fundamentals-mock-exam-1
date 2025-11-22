@@ -1,11 +1,29 @@
-import { SavingProducts } from 'components/SavingProducts';
-import { useState } from 'react';
+import { useSavingProducts } from 'apis/queries/products';
+import { SavingProductList } from 'components/SavingProductList';
+import { useMemo, useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { comma, uncomma } from 'utils';
 
 type TabKey = 'products' | 'results';
 
 export function SavingsCalculatorPage() {
+  // states
   const [selectedTab, setSelectedTab] = useState<TabKey>('products');
+  const [목표금액, set목표금액] = useState<number | null>(null);
+  const [월납입액, set월납입액] = useState<number | null>(null);
+  const [저축기간, set저축기간] = useState<number | null>(null);
+
+  // queries
+  const { data: savingProducts } = useSavingProducts();
+
+  const filteredProducts = useMemo(() => {
+    return savingProducts?.filter(product => {
+      const 월납입액통과 =
+        월납입액 == null ? true : product.minMonthlyAmount < 월납입액 && product.maxMonthlyAmount > 월납입액;
+      const 저축기간통과 = 저축기간 == null ? true : product.availableTerms === 저축기간;
+      return 월납입액통과 && 저축기간통과;
+    });
+  }, [월납입액, 저축기간, savingProducts]);
 
   return (
     <>
@@ -13,11 +31,28 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={comma(목표금액)}
+        onChange={e => set목표금액(e.target.value ? uncomma(e.target.value) : null)}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={comma(월납입액)}
+        onChange={e => set월납입액(e.target.value ? uncomma(e.target.value) : null)}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={저축기간}
+        onChange={value => set저축기간(value)}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
@@ -36,7 +71,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {selectedTab === 'products' && <SavingProducts />}
+      {selectedTab === 'products' && <SavingProductList products={filteredProducts ?? []} />}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
