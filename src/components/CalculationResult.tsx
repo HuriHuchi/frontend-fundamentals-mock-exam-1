@@ -36,16 +36,8 @@ export function CalculationResult({ selectedProduct, 목표금액, 월납입액 
 
   return (
     <>
-      {isNil(월납입액) && (
-        <ListRow
-          contents={
-            <ListRow.Texts type="1RowTypeA" top="월 납입액을 입력하지 않은 경우, 최대 납입 금액을 계산에 적용합니다." />
-          }
-        />
-      )}
-
       {/* 선택된 상품 정보를 보여주기 */}
-      <div style={{ backgroundColor: colors.blue50 }}>
+      <div>
         <ListRow
           contents={
             <ListRow.Texts
@@ -95,6 +87,12 @@ export function CalculationResult({ selectedProduct, 목표금액, 월납입액 
           />
         }
       />
+
+      {isNil(월납입액) && (
+        <p style={{ padding: '0 24px', color: colors.grey500 }}>
+          월 납입액을 입력하지 않은 경우, 선택하신 상품의 최대 납입 금액을 계산에 적용합니다.
+        </p>
+      )}
     </>
   );
 }

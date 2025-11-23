@@ -2,8 +2,8 @@ export function formatPrice(price: number) {
   return comma(price) + '원';
 }
 
-export function comma(value: number | null): string {
-  if (value == null) {
+export function comma(value: number | null | undefined): string {
+  if (value == null || Number.isNaN(value)) {
     return '';
   }
 
@@ -11,5 +11,5 @@ export function comma(value: number | null): string {
 }
 
 export function uncomma(value: string): number {
-  return parseInt(value.replace(/,/g, ''));
+  return parseInt(value.replace(/,/g, ''), 10);
 }

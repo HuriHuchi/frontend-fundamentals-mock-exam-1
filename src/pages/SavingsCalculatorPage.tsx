@@ -101,7 +101,12 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {isLoading && <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품 목록을 불러오는 중..." />} />}
+      {/* NOTE: 실제 운영 환경에서는 로딩 상태를 보여준다. 단 현재 테스트 환경에서는 어색한 UI 깜빡임이 발생하므로 주석 처리  */}
+      {/* {isLoading && (
+        <div style={{ padding: '0 24px' }}>
+          <Skeleton count={5} height={60} style={{ marginBottom: 12 }} />
+        </div>
+      )} */}
 
       {isError && (
         <ListRow
